@@ -5,7 +5,6 @@ from simulate import simulate
 "1st simulation written by ram- check FedAvg vs Scaffold with AWGN"
 
 input_dict = {"dataset": "Femnist",
-              "num_of_users": 100,
               "algorithm": "SCAFFOLD",
               "model": "mclr",
               "num_glob_iters": 250,
@@ -27,7 +26,7 @@ for alg in algorithms:
     for ep in epochs:
         input_dict["algorithm"] = alg
         input_dict["local_epochs"] = ep
-        simulate(**input_dict, hyper_learning_rate=0, L=0, optimizer=None, rho=0)
+        simulate(hyper_learning_rate=0, L=0, optimizer=None, rho=0, **input_dict)
 
 plot_dict = get_plot_dict(input_dict, algorithms, epochs)
 plot_by_epochs(**plot_dict)

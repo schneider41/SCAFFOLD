@@ -9,18 +9,12 @@ import numpy as np
 from scipy.stats import rayleigh
 
 
-# Implementation for FedAvg Server
-
-<<<<<<< HEAD
 # Implementation for SCAFFOLD Server
-
-=======
->>>>>>> parent of 7fdffc4... no message
 class SCAFFOLD(Server):
     def __init__(self, dataset, algorithm, model, batch_size, learning_rate, hyper_learning_rate, L, num_glob_iters,
-                 local_epochs, optimizer, num_users, similarity, times):
+                 local_epochs, optimizer, users_per_round, similarity, times):
         super().__init__(dataset, algorithm, model[0], batch_size, learning_rate, hyper_learning_rate, L,
-                         num_glob_iters, local_epochs, optimizer, num_users, 0, similarity, times)
+                         num_glob_iters, local_epochs, optimizer, users_per_round, 0, similarity, times)
 
         self.server_controls = [torch.zeros_like(p.data) for p in self.model.parameters() if p.requires_grad]
         self.communication_thresh = rayleigh.ppf(0.2)  # h_min
@@ -34,7 +28,6 @@ class SCAFFOLD(Server):
             self.users.append(user)
             self.total_train_samples += user.train_samples
 
-        print("Number of users / total users:", num_users, " / ", total_users)
         print("Finished creating SCAFFOLD server.")
 
     def train(self):
@@ -45,10 +38,10 @@ class SCAFFOLD(Server):
 
             self.send_parameters()
 
-            # Evaluate model each interation
+            # Evaluate model at each iteration
             self.evaluate()
 
-            self.selected_users = self.select_users(glob_iter, self.num_users)
+            self.selected_users = self.select_users(glob_iter, self.users_per_round)
             for user in self.selected_users:
                 user.train(self.local_epochs)
             # self.selected_users = self.select_transmitting_users()

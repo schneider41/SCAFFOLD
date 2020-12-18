@@ -82,8 +82,8 @@ def read_data(dataset):
         train_data: dictionary of train data
         test_data: dictionary of test data
     '''
-    train_data_dir = os.path.join('data',dataset,'data', 'train')
-    test_data_dir = os.path.join('data',dataset,'data', 'test')
+    train_data_dir = os.path.join('data', dataset, 'data', 'train')
+    test_data_dir = os.path.join('data', dataset, 'data', 'test')
     clients = []
     groups = []
     train_data = {}
@@ -117,13 +117,12 @@ def read_user_data(index,data,dataset):
     train_data = data[2][id]
     test_data = data[3][id]
     X_train, y_train, X_test, y_test = train_data['x'], train_data['y'], test_data['x'], test_data['y']
-    if(dataset == "Mnist"):
-        X_train, y_train, X_test, y_test = train_data['x'], train_data['y'], test_data['x'], test_data['y']
+    if dataset == "Mnist":
         X_train = torch.Tensor(X_train).view(-1, NUM_CHANNELS, IMAGE_SIZE, IMAGE_SIZE).type(torch.float32)
         y_train = torch.Tensor(y_train).type(torch.int64)
         X_test = torch.Tensor(X_test).view(-1, NUM_CHANNELS, IMAGE_SIZE, IMAGE_SIZE).type(torch.float32)
         y_test = torch.Tensor(y_test).type(torch.int64)
-    elif(dataset == "Linear_synthetic"):
+    elif dataset == "Linear_synthetic":
         X_train = torch.Tensor(X_train).type(torch.float32)
         y_train = torch.Tensor(y_train).type(torch.float32).unsqueeze(1)
         X_test = torch.Tensor(X_test).type(torch.float32)
@@ -131,6 +130,11 @@ def read_user_data(index,data,dataset):
         #y_train = torch.flatten(y_train, 1)
         #y_test = torch.flatten(y_test, 1)
         #print(y_test.size(),y_train.size())
+    elif dataset == "CIFAR-10":
+        X_train = torch.Tensor(X_train).view(-1, 3, 32, 32).type(torch.float32)
+        y_train = torch.Tensor(y_train).type(torch.int64)
+        X_test = torch.Tensor(X_test).view(-1, 3, 32, 32).type(torch.float32)
+        y_test = torch.Tensor(y_test).type(torch.int64)
     else:
         X_train = torch.Tensor(X_train).type(torch.float32)
         y_train = torch.Tensor(y_train).type(torch.int64)

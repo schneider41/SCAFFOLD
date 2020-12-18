@@ -75,7 +75,7 @@ def plot_summary_one_figure(num_users=100, loc_ep1=5, Numb_Glob_Iters=10, lamb=[
                             hyper_learning_rate=[], algorithms_list=[], batch_size=0, rho=[], dataset=""):
     Numb_Algs = len(algorithms_list)
     # glob_acc, train_acc, train_loss = get_training_data_value(
-    #    num_users, loc_ep1, Numb_Glob_Iters, lamb, learning_rate,hyper_learning_rate, algorithms_list, batch_size, dataset)
+    #    users_per_round, loc_ep1, Numb_Glob_Iters, lamb, learning_rate,hyper_learning_rate, algorithms_list, batch_size, dataset)
 
     glob_acc_, train_acc_, train_loss_ = get_training_data_value(num_users, loc_ep1, Numb_Glob_Iters, lamb,
                                                                  learning_rate, hyper_learning_rate, algorithms_list,
@@ -143,7 +143,7 @@ def plot_summary_mnist(num_users=100, loc_ep1=[], Numb_Glob_Iters=10, lamb=[], l
                        algorithms_list=[], batch_size=0, rho=[], dataset=""):
     Numb_Algs = len(algorithms_list)
 
-    # glob_acc, train_acc, train_loss = get_training_data_value(num_users, loc_ep1, Numb_Glob_Iters, lamb, learning_rate, hyper_learning_rate, algorithms_list, batch_size, rho, dataset)
+    # glob_acc, train_acc, train_loss = get_training_data_value(users_per_round, loc_ep1, Numb_Glob_Iters, lamb, learning_rate, hyper_learning_rate, algorithms_list, batch_size, rho, dataset)
 
     glob_acc_, train_acc_, train_loss_ = get_training_data_value(num_users, loc_ep1, Numb_Glob_Iters, lamb,
                                                                  learning_rate, hyper_learning_rate, algorithms_list,
@@ -279,7 +279,7 @@ def plot_summary_mnist(num_users=100, loc_ep1=[], Numb_Glob_Iters=10, lamb=[], l
 def plot_summary_nist(num_users=100, loc_ep1=[], Numb_Glob_Iters=10, lamb=[], learning_rate=[], hyper_learning_rate=[],
                       algorithms_list=[], batch_size=0, rho=[], dataset=""):
     Numb_Algs = len(algorithms_list)
-    # glob_acc, train_acc, train_loss = get_training_data_value( num_users, loc_ep1, Numb_Glob_Iters, lamb, learning_rate, hyper_learning_rate, algorithms_list, batch_size, rho, dataset)
+    # glob_acc, train_acc, train_loss = get_training_data_value( users_per_round, loc_ep1, Numb_Glob_Iters, lamb, learning_rate, hyper_learning_rate, algorithms_list, batch_size, rho, dataset)
     glob_acc_, train_acc_, train_loss_ = get_training_data_value(num_users, loc_ep1, Numb_Glob_Iters, lamb,
                                                                  learning_rate, hyper_learning_rate, algorithms_list,
                                                                  batch_size, rho, dataset)
@@ -534,7 +534,7 @@ def average_data(num_users, loc_ep1, Numb_Glob_Iters, lamb, learning_rate, hyper
     if (rho > 0):
         alg += "_" + str(rho) + "p"
 
-    # alg = alg + "_" + str(learning_rate) + "_" + str(hyper_learning_rate) + "_" + str(lamb) + "_" + str(num_users) + "u" + "_" + str(batch_size) + "b" + "_" + str(loc_ep1)
+    # alg = alg + "_" + str(learning_rate) + "_" + str(hyper_learning_rate) + "_" + str(lamb) + "_" + str(users_per_round) + "u" + "_" + str(batch_size) + "b" + "_" + str(loc_ep1)
     alg = alg + "_" + "avg"
     if (len(glob_acc) != 0 & len(train_acc) & len(train_loss)):
         with h5py.File("./results/" + '{}.h5'.format(alg, loc_ep1), 'w') as hf:
@@ -549,7 +549,7 @@ def plot_summary_one_mnist(num_users=100, loc_ep1=5, Numb_Glob_Iters=10, lamb=[]
                            hyper_learning_rate=[], algorithms_list=[], batch_size=0, rho=[], dataset=""):
     Numb_Algs = len(algorithms_list)
     # glob_acc, train_acc, train_loss = get_training_data_value(
-    #    num_users, loc_ep1, Numb_Glob_Iters, lamb, learning_rate,hyper_learning_rate, algorithms_list, batch_size, dataset)
+    #    users_per_round, loc_ep1, Numb_Glob_Iters, lamb, learning_rate,hyper_learning_rate, algorithms_list, batch_size, dataset)
 
     glob_acc_, train_acc_, train_loss_ = get_training_data_value(num_users, loc_ep1, Numb_Glob_Iters, lamb,
                                                                  learning_rate, hyper_learning_rate, algorithms_list,
@@ -622,7 +622,7 @@ def plot_summary_one_nist(num_users=100, loc_ep1=5, Numb_Glob_Iters=10, lamb=[],
                           hyper_learning_rate=[], algorithms_list=[], batch_size=0, rho=[], dataset=""):
     Numb_Algs = len(algorithms_list)
     # glob_acc, train_acc, train_loss = get_training_data_value(
-    #    num_users, loc_ep1, Numb_Glob_Iters, lamb, learning_rate,hyper_learning_rate, algorithms_list, batch_size, dataset)
+    #    users_per_round, loc_ep1, Numb_Glob_Iters, lamb, learning_rate,hyper_learning_rate, algorithms_list, batch_size, dataset)
 
     glob_acc_, train_acc_, train_loss_ = get_training_data_value(num_users, loc_ep1, Numb_Glob_Iters, lamb,
                                                                  learning_rate, hyper_learning_rate, algorithms_list,

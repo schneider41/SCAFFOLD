@@ -9,7 +9,7 @@ import copy
 
 class Server:
     def __init__(self, dataset, algorithm, model, batch_size, learning_rate, hyper_learning_rate, L,
-                 num_glob_iters, local_epochs, optimizer, num_users, rho,similarity,times):
+                 num_glob_iters, local_epochs, optimizer, users_per_round, rho,similarity,times):
 
         # Set up the main attributes
         self.dataset = dataset
@@ -21,7 +21,7 @@ class Server:
         self.model = copy.deepcopy(model)
         self.users = []
         self.selected_users = []
-        self.num_users = num_users
+        self.users_per_round = users_per_round
         self.hyper_learning_rate = hyper_learning_rate
         self.L = L
         self.algorithm = algorithm
@@ -59,7 +59,7 @@ class Server:
             if param.grad != None:
                 param.grad.data = torch.zeros_like(param.grad.data)
         total_train = 0
-        # if(self.num_users = self.to)
+        # if(self.users_per_round = self.to)
         for user in self.selected_users:
             total_train += user.train_samples
         for user in self.selected_users:
@@ -80,21 +80,20 @@ class Server:
     def model_exists(self):
         return os.path.exists(os.path.join("models", self.dataset, "server" + ".pt"))
 
-    def select_users(self, round, num_users):
-        if num_users == len(self.users):
-            print("All users are selected")
+    def select_users(self, round, users_per_round):
+        if users_per_round in [len(self.users), 0]:
             return self.users
 
-        num_users = min(num_users, len(self.users))
+        users_per_round = min(users_per_round, len(self.users))
         # fix the list of user consistent
         np.random.seed(round * (self.times + 1))
-        return np.random.choice(self.users, num_users, replace=False)  # , p=pk)
+        return np.random.choice(self.users, users_per_round, replace=False)  # , p=pk)
 
     def save_results(self):
         """ Save loss, accuracy to h5 file"""
         file_name = "./results/" + self.dataset + "_" + self.algorithm
         file_name += "_" + str(self.learning_rate) + "lr"
-        file_name += "_" + str(self.num_users) + "u"
+        file_name += "_" + str(self.users_per_round) + "u"
         file_name += "_" + str(self.batch_size) + "b"
         file_name += "_" + str(self.local_epochs) + "e"
         file_name += "_" + str(self.similarity) + "s"

@@ -11,8 +11,8 @@ import numpy as np
 class FEDL(Server):
     def __init__(self, dataset,algorithm, model, batch_size, learning_rate, hyper_learning_rate, L, num_glob_iters,
                  local_epochs, optimizer, num_users,rho, times):
-        super().__init__(dataset,algorithm, model[0], batch_size, learning_rate, hyper_learning_rate, L, num_glob_iters,
-                         local_epochs, optimizer, num_users,rho, times)
+        super().__init__(dataset, algorithm, model[0], batch_size, learning_rate, hyper_learning_rate, L,
+                         num_glob_iters, local_epochs, optimizer, num_users, rho, times, )
 
         # Initialize data for all  users
         data = read_data(dataset)
@@ -33,7 +33,7 @@ class FEDL(Server):
 
             self.send_parameters()
             self.evaluate()
-            self.selected_users = self.select_users(glob_iter,self.num_users)
+            self.selected_users = self.select_users(glob_iter, self.users_per_round)
             for user in self.selected_users:
                 user.train(self.local_epochs) #* user.train_samples
             self.aggregate_parameters()
