@@ -47,7 +47,7 @@ class SCAFFOLD(Server):
             # self.selected_users = self.select_transmitting_users()
             # print(f"Transmitting {len(self.selected_users)} users")
             self.aggregate_parameters()
-            self.apply_channel_effect()
+            # self.apply_channel_effect()
             # loss_ /= self.total_train_samples
             # loss.append(loss_)
             # print(loss_)
@@ -84,7 +84,7 @@ class SCAFFOLD(Server):
         num_of_samples = user.train_samples
         for param, control, del_control, del_model in zip(self.model.parameters(), self.server_controls,
                                                           user.delta_controls, user.delta_model):
-            param.data = param.data + del_model.data * num_of_samples / num_of_selected_users
+            param.data = param.data + del_model.data * num_of_samples / total_samples / num_of_selected_users
             # control.data = control.data + del_control.data * num_of_samples / total_samples
             # param.data = param.data + del_model.data / num_of_selected_users
             control.data = control.data + del_control.data / num_of_users

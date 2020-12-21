@@ -4,19 +4,19 @@ from simulate import simulate
 "start simulation to our choosing"
 "1st simulation written by ram- check FedAvg vs Scaffold with AWGN"
 
-input_dict = {"dataset": "Femnist",
+input_dict = {"dataset": "CIFAR-10",
               "algorithm": "SCAFFOLD",
-              "model": "mclr",
+              "model": "CIFAR-10",
               "num_glob_iters": 250,
-              "batch_size": 4,
+              "batch_size": 60,
               "learning_rate": 0.01,
               "local_epochs": 1,
-              "clients_per_round": 20,
-              "similarity": 1,
+              "users_per_round": 0,
+              "similarity": 0.8,
               "times": 1}
 
-algorithms = ["FedAvg", "SCAFFOLD"]
-epochs = [1, 5]
+algorithms = ["FedAvg"]
+epochs = [1]
 
 # input_dict["algorithm"] = algorithms[1]
 # input_dict["local_epochs"] = 1

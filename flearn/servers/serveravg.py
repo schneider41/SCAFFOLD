@@ -9,7 +9,6 @@ import numpy as np
 
 
 # Implementation for FedAvg Server
-
 class FedAvg(Server):
     def __init__(self, dataset, algorithm, model, batch_size, learning_rate, hyper_learning_rate, L, num_glob_iters,
                  local_epochs, optimizer, num_users, rho,similarity,times):
