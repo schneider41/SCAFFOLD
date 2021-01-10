@@ -32,6 +32,8 @@ class UserAVG(User):
         #     self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.learning_rate)
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.learning_rate)
 
+        self.csi = None
+
     def set_grads(self, new_grads):
         if isinstance(new_grads, nn.Parameter):
             for model_grad, new_grad in zip(self.model.parameters(), new_grads):
@@ -51,5 +53,16 @@ class UserAVG(User):
                 loss = self.loss(output, y)
                 loss.backward()
                 self.optimizer.step()
-            self.clone_model_paramenter(self.model.parameters(), self.local_model)
+
+        # get model difference
+        for local, server, delta in zip(self.model.parameters(), self.server_model, self.delta_model):
+            delta.data = local.data.detach() - server.data.detach()
+
         return loss
+
+    def get_params_norm(self):
+        params = []
+        for delta in self.delta_model:
+            params.append(torch.flatten(delta.data))
+        # return torch.linalg.norm(torch.cat(params), 2)
+        return torch.norm(torch.cat(params), 2)

@@ -5,11 +5,12 @@ import h5py
 import numpy as np
 from utils.model_utils import Metrics
 import copy
+from scipy.stats import rayleigh
 
 
 class Server:
     def __init__(self, dataset, algorithm, model, batch_size, learning_rate, hyper_learning_rate, L,
-                 num_glob_iters, local_epochs, optimizer, users_per_round, rho,similarity,times):
+                 num_glob_iters, local_epochs, optimizer, users_per_round, rho, similarity, noise, times):
 
         # Set up the main attributes
         self.dataset = dataset
@@ -30,6 +31,8 @@ class Server:
         self.rho = rho
         self.times = times
         self.similarity = similarity
+        self.communication_thresh = rayleigh.ppf(0.2)  # h_min
+        self.noise = noise
 
     def aggregate_grads(self):
         assert (self.users is not None and len(self.users) > 0)
@@ -89,6 +92,14 @@ class Server:
         np.random.seed(round * (self.times + 1))
         return np.random.choice(self.users, users_per_round, replace=False)  # , p=pk)
 
+    def select_transmitting_users(self):
+        transmitting_users = []
+        for user in self.selected_users:
+            user.csi = rayleigh.rvs()
+            if user.csi >= self.communication_thresh:
+                transmitting_users.append(user)
+        return transmitting_users
+
     def save_results(self):
         """ Save loss, accuracy to h5 file"""
         file_name = "./results/" + self.dataset + "_" + self.algorithm
@@ -97,6 +108,8 @@ class Server:
         file_name += "_" + str(self.batch_size) + "b"
         file_name += "_" + str(self.local_epochs) + "e"
         file_name += "_" + str(self.similarity) + "s"
+        if self.noise:
+            file_name += '_noisy'
         file_name += "_" + str(self.times) + ".h5"
         if len(self.rs_glob_acc) != 0 & len(self.rs_train_acc) & len(self.rs_train_loss):
             with h5py.File(file_name, 'w') as hf:

@@ -11,9 +11,9 @@ import numpy as np
 # Implementation for FedAvg Server
 class FedAvg(Server):
     def __init__(self, dataset, algorithm, model, batch_size, learning_rate, hyper_learning_rate, L, num_glob_iters,
-                 local_epochs, optimizer, num_users, rho,similarity,times):
+                 local_epochs, optimizer, num_users, rho, similarity, noise, times):
         super().__init__(dataset, algorithm, model[0], batch_size, learning_rate, hyper_learning_rate, L,
-                         num_glob_iters, local_epochs, optimizer, num_users, rho, similarity, times)
+                         num_glob_iters, local_epochs, optimizer, num_users, rho, similarity, noise, times)
 
         # Initialize data for all  users
         data = read_data(dataset)
@@ -28,17 +28,6 @@ class FedAvg(Server):
         print("Number of users / total users:", num_users, " / ", total_users)
         print("Finished creating FedAvg server.")
 
-    def send_grads(self):
-        assert (self.users is not None and len(self.users) > 0)
-        grads = []
-        for param in self.model.parameters():
-            if param.grad is None:
-                grads.append(torch.zeros_like(param.data))
-            else:
-                grads.append(param.grad)
-        for user in self.users:
-            user.set_grads(grads)
-
     def train(self):
         loss = []
         for glob_iter in range(self.num_glob_iters):
@@ -52,7 +41,15 @@ class FedAvg(Server):
             self.selected_users = self.select_users(glob_iter, self.users_per_round)
             for user in self.selected_users:
                 user.train(self.local_epochs)  # * user.train_samples
+
+            if self.noise:
+                self.selected_users = self.select_transmitting_users()
+                print(f"Transmitting {len(self.selected_users)} users")
+
             self.aggregate_parameters()
+
+            if self.noise:
+                self.apply_channel_effect()
             # loss_ /= self.total_train_samples
             # loss.append(loss_)
             # print(loss_)
@@ -60,3 +57,25 @@ class FedAvg(Server):
         self.save_results()
         self.save_model()
 
+    def aggregate_parameters(self):
+        assert (self.users is not None and len(self.users) > 0)
+        total_train = 0
+        for user in self.selected_users:
+            total_train += user.train_samples
+        for user in self.selected_users:
+            self.add_parameters(user, user.train_samples / total_train)
+
+    def add_parameters(self, user, ratio):
+        for server_param, del_model in zip(self.model.parameters(), user.delta_model):
+            server_param.data = server_param.data + del_model.data * ratio
+
+    def apply_channel_effect(self, sigma=1, power_control=1e26):
+        num_of_selected_users = len(self.selected_users)
+        users_norms = []
+        for user in self.selected_users:
+            users_norms.append(user.get_params_norm())
+        alpha_t = power_control / max(users_norms) ** 2
+        alpha_t = 1e8
+        for param in self.model.parameters():
+            param.data = param.data + sigma / (alpha_t ** 0.5 * num_of_selected_users * self.communication_thresh)\
+                         * torch.randn(param.data.size())

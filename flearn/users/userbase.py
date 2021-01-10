@@ -32,15 +32,19 @@ class User:
         self.iter_trainloader = iter(self.trainloader)
         self.iter_testloader = iter(self.testloader)
 
+        self.delta_model = [torch.zeros_like(p.data) for p in self.model.parameters() if p.requires_grad]
+        self.server_model = [torch.zeros_like(p.data) for p in self.model.parameters() if p.requires_grad]
+
         # those parameters are for FEDL.
-        self.local_model = copy.deepcopy(list(self.model.parameters()))  # TODO: refactor local_model to server_model
+        self.local_model = copy.deepcopy(list(self.model.parameters()))
         self.server_grad = copy.deepcopy(list(self.model.parameters()))
         self.pre_local_grad = copy.deepcopy(list(self.model.parameters()))
 
-    def set_parameters(self, model):
-        for old_param, new_param, local_param in zip(self.model.parameters(), model.parameters(), self.local_model):
+    def set_parameters(self, server_model):
+        for old_param, new_param, local_param, server_param in zip(self.model.parameters(), server_model.parameters(), self.local_model, self.server_model):
             old_param.data = new_param.data.clone()
             local_param.data = new_param.data.clone()
+            server_param.data = new_param.data.clone()
             if(new_param.grad != None):
                 if(old_param.grad == None):
                     old_param.grad = torch.zeros_like(new_param.grad)
@@ -71,12 +75,11 @@ class User:
         return self.local_weight_updated
     
     def update_parameters(self, new_params):
-        for param , new_param in zip(self.model.parameters(), new_params):
+        for param, new_param in zip(self.model.parameters(), new_params):
             param.data = new_param.data.clone()
             param.grad.data = new_param.grad.data.clone()
 
     def get_grads(self, grads):
-
         self.optimizer.zero_grad()
         
         for x, y in self.trainloaderfull:
@@ -147,3 +150,11 @@ class User:
     @staticmethod
     def model_exists():
         return os.path.exists(os.path.join("models", "server" + ".pt"))
+
+    @staticmethod
+    def get_params_norm(parameters):
+        params_list = []
+        for param in parameters:
+            params_list.append(torch.flatten(param.data))
+        # return torch.linalg.norm(torch.cat(params), 2)
+        return torch.norm(torch.cat(params_list), 2)

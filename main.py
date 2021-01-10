@@ -1,26 +1,31 @@
 from utils.plot_utils import *
 from simulate import simulate
+from data.Femnist.data_generator import generate_data as femnist_generator
 
-"start simulation to our choosing"
-"1st simulation written by ram- check FedAvg vs Scaffold with AWGN"
 
-input_dict = {"dataset": "CIFAR-10",
-              "algorithm": "SCAFFOLD",
-              "model": "CIFAR-10",
+def create_dataset(dataset, total_users, similarity, samples_num):
+    if dataset == "Femnist":
+        femnist_generator(similarity, total_users, samples_num)
+    if dataset == "CIFAR-10":
+        pass  # TODO : create data generator for CIFAR-10
+    if dataset == "Mnist":
+        pass  # TODO : create data generator for Mnist
+
+
+input_dict = {"dataset": "Femnist",
+              "algorithm": None,
+              "model": "mclr",
               "num_glob_iters": 250,
-              "batch_size": 60,
+              "batch_size": 4,
               "learning_rate": 0.01,
-              "local_epochs": 1,
-              "users_per_round": 0,
-              "similarity": 0.8,
-              "times": 1}
+              "local_epochs": None,
+              "users_per_round": 25,
+              "similarity": 0.1,
+              "times": 1,
+              "noise": True}
 
-algorithms = ["FedAvg"]
+algorithms = ["SCAFFOLD", "FedAvg"]
 epochs = [1]
-
-# input_dict["algorithm"] = algorithms[1]
-# input_dict["local_epochs"] = 1
-# simulate(**input_dict, hyper_learning_rate=0, L=0, optimizer=None, rho=0)
 
 for alg in algorithms:
     for ep in epochs:
@@ -28,8 +33,14 @@ for alg in algorithms:
         input_dict["local_epochs"] = ep
         simulate(hyper_learning_rate=0, L=0, optimizer=None, rho=0, **input_dict)
 
+# for similarity in similarities:
+#     create_dataset(input_dict["dataset"], 100, similarity, 20)
+#     input_dict["similarity"] = similarity
+#     for alg in algorithms:
+#         for ep in epochs:
+#             input_dict["algorithm"] = alg
+#             input_dict["local_epochs"] = ep
+#             simulate(hyper_learning_rate=0, L=0, optimizer=None, rho=0, **input_dict)
+
 plot_dict = get_plot_dict(input_dict, algorithms, epochs)
 plot_by_epochs(**plot_dict)
-
-
-

@@ -18,8 +18,8 @@ def read_from_results(file_name):
 
 
 # TODO: replace all args with input_dict
-def get_all_training_data_value(clients_per_round=100, local_epochs=5, num_glob_iters=10, learning_rate=0,
-                                algorithm="", batch_size=0, dataset="", times=5, similarity=0):
+def get_all_training_data_value(clients_per_round, local_epochs, num_glob_iters, learning_rate,
+                                algorithm, batch_size, dataset, times, similarity, noise):
     train_acc = np.zeros((times, num_glob_iters))
     train_loss = np.zeros((times, num_glob_iters))
     glob_acc = np.zeros((times, num_glob_iters))
@@ -30,6 +30,8 @@ def get_all_training_data_value(clients_per_round=100, local_epochs=5, num_glob_
     file_name += "_" + str(batch_size) + "b"
     file_name += "_" + str(local_epochs) + "e"
     file_name += "_" + str(similarity) + "s"
+    if noise:
+        file_name += '_noisy'
 
     for i in range(times):
         f = file_name + "_" + str(i) + ".h5"
@@ -56,10 +58,10 @@ def average_smooth(data, window_len=10, window='hanning'):
 
 
 def average_data(clients_per_round, local_epochs, num_glob_iters, learning_rate, algorithm, batch_size,
-                 dataset, times, similarity):
+                 dataset, times, similarity, noise):
     glob_acc, train_acc, train_loss = get_all_training_data_value(clients_per_round, local_epochs, num_glob_iters,
                                                                   learning_rate, algorithm, batch_size, dataset, times,
-                                                                  similarity)
+                                                                  similarity, noise)
 
     glob_acc_data = np.average(glob_acc, axis=0)
     train_acc_data = np.average(train_acc, axis=0)
@@ -78,6 +80,8 @@ def average_data(clients_per_round, local_epochs, num_glob_iters, learning_rate,
     file_name += "_" + str(batch_size) + "b"
     file_name += "_" + str(local_epochs) + "e"
     file_name += "_" + str(similarity) + "s"
+    if noise:
+        file_name += '_noisy'
     file_name += "_avg.h5"
 
     if len(glob_acc) != 0 & len(train_acc) & len(train_loss):
@@ -89,17 +93,17 @@ def average_data(clients_per_round, local_epochs, num_glob_iters, learning_rate,
     return 0
 
 
-def get_plot_dict(input_dict, algorithms, epochs):
-    keys = ["dataset", "learning_rate", "clients_per_round", "batch_size", "local_epochs", "similarity",
-            "num_glob_iters"]
+def get_plot_dict(input_dict, algorithms, local_epochs):
+    keys = ["dataset", "learning_rate", "num_glob_iters", "users_per_round", "batch_size", "local_epochs",
+            "similarity", "noise"]
     plot_dict = {x: input_dict[x] for x in keys}
-    plot_dict["local_epochs"] = epochs
+    plot_dict["local_epochs"] = local_epochs
     plot_dict["algorithms"] = algorithms
     return plot_dict
 
 
-def plot_by_epochs(dataset, algorithms, learning_rate, clients_per_round, batch_size, local_epochs, similarity,
-                   num_glob_iters):
+def plot_by_epochs(dataset, algorithms, num_glob_iters, learning_rate, users_per_round, batch_size, local_epochs,
+                   similarity, noise):
     # TODO: check if i can take all this args from the results file
     """take the Monta Carlo simulation and present it SCAFFOLD vs FedAvg"""
     colours = ['r', 'g', 'b']
@@ -121,10 +125,12 @@ def plot_by_epochs(dataset, algorithms, learning_rate, clients_per_round, batch_
             file_name = "./results/" + dataset
             file_name += "_" + algorithm
             file_name += "_" + str(learning_rate) + "lr"
-            file_name += "_" + str(clients_per_round) + "u"
+            file_name += "_" + str(users_per_round) + "u"
             file_name += "_" + str(batch_size) + "b"
             file_name += "_" + str(epochs) + "e"
             file_name += "_" + str(similarity) + "s"
+            if noise:
+                file_name += '_noisy'
             file_name += "_avg.h5"
             train_acc, train_loss, glob_acc = np.array(read_from_results(file_name))[:, :num_glob_iters]
             axs[k].plot(glob_acc, color=colours[j], label=algorithm)

@@ -36,7 +36,6 @@ class UserSCAFFOLD(User):
         self.controls = [torch.zeros_like(p.data) for p in self.model.parameters() if p.requires_grad]
         self.server_controls = [torch.zeros_like(p.data) for p in self.model.parameters() if p.requires_grad]
         self.delta_controls = [torch.zeros_like(p.data) for p in self.model.parameters() if p.requires_grad]
-        self.delta_model = [torch.zeros_like(p.data) for p in self.model.parameters() if p.requires_grad]
         self.csi = None
 
     def set_grads(self, new_grads):
@@ -62,7 +61,7 @@ class UserSCAFFOLD(User):
                 self.optimizer.step(self.server_controls, self.controls)
 
         # get model difference
-        for local, server, delta in zip(self.model.parameters(), self.local_model, self.delta_model):
+        for local, server, delta in zip(self.model.parameters(), self.server_model, self.delta_model):
             delta.data = local.data.detach() - server.data.detach()
 
         # get client new controls
