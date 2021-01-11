@@ -25,7 +25,7 @@ input_dict = {"dataset": "CIFAR-10",
               "times": 1,
               "noise": False}
 
-algorithms = ["SCAFFOLD", " FedAvg"]
+algorithms = ["SCAFFOLD", "FedAvg"]
 epochs = [1]
 
 for alg in algorithms:

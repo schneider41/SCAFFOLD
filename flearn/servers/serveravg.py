@@ -70,7 +70,9 @@ class FedAvg(Server):
 
     def add_parameters(self, user, ratio):
         for server_param, del_model in zip(self.model.parameters(), user.delta_model):
-            server_param.data = server_param.data + del_model.data * ratio
+            num_of_selected_users = len(self.selected_users)
+            # server_param.data = server_param.data + del_model.data * ratio
+            server_param.data = server_param.data + del_model.data / num_of_selected_users
 
     def apply_channel_effect(self, sigma=1, power_control=1e26):
         num_of_selected_users = len(self.selected_users)
