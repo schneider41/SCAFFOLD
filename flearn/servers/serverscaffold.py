@@ -16,8 +16,6 @@ class SCAFFOLD(Server):
         super().__init__(dataset, algorithm, model[0], batch_size, learning_rate, hyper_learning_rate, L,
                          num_glob_iters, local_epochs, optimizer, users_per_round, 0, similarity, noise, times)
 
-        self.server_controls = [torch.zeros_like(p.data) for p in self.model.parameters() if p.requires_grad]
-
         # Initialize data for all  users
         data = read_data(dataset)
         total_users = len(data[0])
@@ -27,6 +25,12 @@ class SCAFFOLD(Server):
                                 optimizer)
             self.users.append(user)
             self.total_train_samples += user.train_samples
+
+        if not users_per_round:
+            self.users_per_round = total_users
+        print("Number of users / total users:", self.users_per_round, " / ", total_users)
+
+        self.server_controls = [torch.zeros_like(p.data) for p in self.model.parameters() if p.requires_grad]
 
         print("Finished creating SCAFFOLD server.")
 
@@ -42,13 +46,13 @@ class SCAFFOLD(Server):
             self.evaluate()
 
             self.selected_users = self.select_users(glob_iter, self.users_per_round)
-
             if self.noise:
                 self.selected_users = self.select_transmitting_users()
                 print(f"Transmitting {len(self.selected_users)} users")
 
             for user in self.selected_users:
-                user.train(self.local_epochs)
+                user.train()
+                user.drop_lr()
 
             self.aggregate_parameters()
 

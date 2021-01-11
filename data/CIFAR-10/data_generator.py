@@ -39,7 +39,7 @@ for i in range(min(train_labels), num_of_labels + min(train_labels)):
     cifar_data.append(train_images[idx])
 
 # Assign 100 samples to each user
-similarity = 0.8  # between 0 to 1
+similarity = 1  # between 0 to 1
 num_of_users = 10
 samples_num = 5000
 iid_samples = int(similarity * samples_num)

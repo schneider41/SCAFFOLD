@@ -7,15 +7,16 @@ from torch.utils.data import DataLoader
 from flearn.users.userbase import User
 from flearn.optimizers.fedoptimizer import *
 import math
+from torch.optim.lr_scheduler import StepLR
 
 
 # Implementation for SCAFFOLD clients
 
 class UserSCAFFOLD(User):
-    def __init__(self, numeric_id, train_data, test_data, model, batch_size, learning_rate, hyper_learning_rate, L,
-                 local_epochs, optimizer):
-        super().__init__(numeric_id, train_data, test_data, model[0], batch_size, learning_rate, hyper_learning_rate, L,
-                         local_epochs)
+    def __init__(self, numeric_id, train_data, test_data, model, batch_size, learning_rate,
+                 hyper_learning_rate, L, local_epochs, optimizer):
+        super().__init__(numeric_id, train_data, test_data, model[0], batch_size, learning_rate,
+                         hyper_learning_rate, L, local_epochs)
 
         if model[1] == "linear":
             self.loss = nn.MSELoss()
@@ -24,14 +25,23 @@ class UserSCAFFOLD(User):
         else:
             self.loss = nn.NLLLoss()
 
-        # if model[1] == "CIFAR-10":
-        #     layers = [self.model.conv1, self.model.conv2, self.model.conv3, self.model.fc1, self.model.fc2]
-        #     self.optimizer = SCAFFOLDOptimizer([{'params': layer.weight} for layer in layers] +
-        #                                        [{'params': layer.bias, 'lr': 2*self.learning_rate} for layer in layers],
-        #                                        lr=self.learning_rate)
-        # else:
-        #     self.optimizer = SCAFFOLDOptimizer(self.model.parameters(), lr=self.learning_rate)
-        self.optimizer = SCAFFOLDOptimizer(self.model.parameters(), lr=self.learning_rate)
+        if model[1] == "CIFAR-10":
+            layers = [self.model.conv1, self.model.conv2, self.model.conv3, self.model.fc1, self.model.fc2]
+            weights = [{'params': layer.weight} for layer in layers]
+            biases = [{'params': layer.bias, 'lr': 2 * self.learning_rate} for layer in layers]
+            param_groups = [None] * (len(weights) + len(biases))
+            param_groups[::2] = weights
+            param_groups[1::2] = biases
+            self.optimizer = SCAFFOLDOptimizer(param_groups, lr=self.learning_rate, weight_decay=L)
+            # self.optimizer = SCAFFOLDOptimizer([{'params': layer.weight} for layer in layers] +
+            #                                    [{'params': layer.bias, 'lr': 2 * self.learning_rate} for layer in
+            #                                     layers],
+            #                                    lr=self.learning_rate, weight_decay=L)
+
+            self.scheduler = StepLR(self.optimizer, step_size=8, gamma=0.1)
+            self.lr_drop_rate = 0.95
+        else:
+            self.optimizer = SCAFFOLDOptimizer(self.model.parameters(), lr=self.learning_rate)
 
         self.controls = [torch.zeros_like(p.data) for p in self.model.parameters() if p.requires_grad]
         self.server_controls = [torch.zeros_like(p.data) for p in self.model.parameters() if p.requires_grad]
@@ -46,19 +56,20 @@ class UserSCAFFOLD(User):
             for idx, model_grad in enumerate(self.model.parameters()):
                 model_grad.data = new_grads[idx]
 
-    def train(self, epochs):
+    def train(self):
         self.model.train()
         grads = [torch.zeros_like(p.data) for p in self.model.parameters() if p.requires_grad]
         self.get_grads(grads)
         for epoch in range(1, self.local_epochs + 1):
             self.model.train()
-            # loss_per_epoch = 0
             for batch_idx, (X, y) in enumerate(self.trainloader):
                 self.optimizer.zero_grad()
                 output = self.model(X)
                 loss = self.loss(output, y)
                 loss.backward()
                 self.optimizer.step(self.server_controls, self.controls)
+            if self.scheduler:
+                self.scheduler.step()
 
         # get model difference
         for local, server, delta in zip(self.model.parameters(), self.server_model, self.delta_model):

@@ -12,26 +12,27 @@ def create_dataset(dataset, total_users, similarity, samples_num):
         pass  # TODO : create data generator for Mnist
 
 
-input_dict = {"dataset": "Femnist",
+input_dict = {"dataset": "CIFAR-10",
               "algorithm": None,
-              "model": "mclr",
-              "num_glob_iters": 250,
-              "batch_size": 4,
-              "learning_rate": 0.01,
+              "model": "CIFAR-10",
+              "num_glob_iters": 50,
+              "batch_size": 60,
+              "learning_rate": 0.008,
               "local_epochs": None,
-              "users_per_round": 25,
-              "similarity": 0.1,
+              "L": 0.004,
+              "users_per_round": 0,
+              "similarity": 1,
               "times": 1,
-              "noise": True}
+              "noise": False}
 
-algorithms = ["SCAFFOLD", "FedAvg"]
+algorithms = ["SCAFFOLD", " FedAvg"]
 epochs = [1]
 
 for alg in algorithms:
     for ep in epochs:
         input_dict["algorithm"] = alg
         input_dict["local_epochs"] = ep
-        simulate(hyper_learning_rate=0, L=0, optimizer=None, rho=0, **input_dict)
+        simulate(hyper_learning_rate=0, optimizer=None, rho=0, **input_dict)
 
 # for similarity in similarities:
 #     create_dataset(input_dict["dataset"], 100, similarity, 20)

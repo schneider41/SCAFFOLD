@@ -7,11 +7,13 @@ from torch.utils.data import DataLoader
 import numpy as np
 import copy
 
+
 class User:
     """
     Base class for users in federated learning.
     """
-    def __init__(self, id, train_data, test_data, model, batch_size = 0, learning_rate = 0, hyper_learning_rate = 0 , L = 0, local_epochs = 0):
+    def __init__(self, id, train_data, test_data, model, batch_size, learning_rate,
+                 hyper_learning_rate, L, local_epochs):
         # from fedprox
         self.model = copy.deepcopy(model)
         self.id = id  # integer
@@ -25,6 +27,8 @@ class User:
         self.hyper_learning_rate = hyper_learning_rate
         self.L = L
         self.local_epochs = local_epochs
+        self.scheduler = None
+        self.lr_drop_rate = 1
         self.trainloader = DataLoader(train_data, self.batch_size)
         self.testloader = DataLoader(test_data, self.batch_size)
         self.testloaderfull = DataLoader(test_data, self.test_samples)
@@ -158,3 +162,8 @@ class User:
             params_list.append(torch.flatten(param.data))
         # return torch.linalg.norm(torch.cat(params), 2)
         return torch.norm(torch.cat(params_list), 2)
+
+    def drop_lr(self):
+        for group in self.optimizer.param_groups:
+            group['lr'] *= self.lr_drop_rate
+            group['initial_lr'] *= self.lr_drop_rate

@@ -10,10 +10,10 @@ import numpy as np
 
 # Implementation for FedAvg Server
 class FedAvg(Server):
-    def __init__(self, dataset, algorithm, model, batch_size, learning_rate, hyper_learning_rate, L, num_glob_iters,
-                 local_epochs, optimizer, num_users, rho, similarity, noise, times):
+    def __init__(self, dataset, algorithm, model, batch_size, learning_rate, hyper_learning_rate, L,
+                 num_glob_iters, local_epochs, optimizer, users_per_round, rho, similarity, noise, times):
         super().__init__(dataset, algorithm, model[0], batch_size, learning_rate, hyper_learning_rate, L,
-                         num_glob_iters, local_epochs, optimizer, num_users, rho, similarity, noise, times)
+                         num_glob_iters, local_epochs, optimizer, users_per_round, rho, similarity, noise, times)
 
         # Initialize data for all  users
         data = read_data(dataset)
@@ -25,7 +25,9 @@ class FedAvg(Server):
             self.users.append(user)
             self.total_train_samples += user.train_samples
 
-        print("Number of users / total users:", num_users, " / ", total_users)
+        if not users_per_round:
+            self.users_per_round = total_users
+        print("Number of users / total users:", self.users_per_round, " / ", total_users)
         print("Finished creating FedAvg server.")
 
     def train(self):
@@ -39,12 +41,13 @@ class FedAvg(Server):
             self.evaluate()
 
             self.selected_users = self.select_users(glob_iter, self.users_per_round)
-            for user in self.selected_users:
-                user.train(self.local_epochs)  # * user.train_samples
-
             if self.noise:
                 self.selected_users = self.select_transmitting_users()
                 print(f"Transmitting {len(self.selected_users)} users")
+
+            for user in self.selected_users:
+                user.train()
+                user.drop_lr()
 
             self.aggregate_parameters()
 
