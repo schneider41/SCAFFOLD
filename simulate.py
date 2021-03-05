@@ -6,9 +6,8 @@ import argparse
 import importlib
 import random
 import os
-from flearn.servers.serveravg import FedAvg
-from flearn.servers.serverfedl import FEDL
-from flearn.servers.serverscaffold import SCAFFOLD
+from flearn.servers.server_avg import FedAvg
+from flearn.servers.server_scaffold import SCAFFOLD
 from flearn.trainmodel.models import *
 from utils.plot_utils import *
 import torch
@@ -17,7 +16,7 @@ torch.manual_seed(0)
 
 
 def simulate(dataset, algorithm, model, batch_size, learning_rate, hyper_learning_rate, L, num_glob_iters,
-             local_epochs, optimizer, users_per_round, rho, similarity, noise, times):
+             local_epochs, users_per_round, rho, similarity, noise, times):
     print("=" * 80)
     print("Summary of training process:")
     print(f"Algorithm: {algorithm}")
@@ -50,11 +49,11 @@ def simulate(dataset, algorithm, model, batch_size, learning_rate, hyper_learnin
         # select algorithm
         if algorithm == "FedAvg":
             server = FedAvg(dataset, algorithm, model, batch_size, learning_rate, hyper_learning_rate, L,
-                            num_glob_iters, local_epochs, optimizer, users_per_round, rho, similarity, noise, i)
+                            num_glob_iters, local_epochs, users_per_round, rho, similarity, noise, i)
 
         if algorithm == "SCAFFOLD":
             server = SCAFFOLD(dataset, algorithm, model, batch_size, learning_rate, hyper_learning_rate, L,
-                              num_glob_iters, local_epochs, optimizer, users_per_round, similarity, noise, i)
+                              num_glob_iters, local_epochs, users_per_round, similarity, noise, i)
         server.train()
         server.test()
 
@@ -76,7 +75,6 @@ if __name__ == "__main__":
     parser.add_argument("--L", type=int, default=0.004, help="Regularization term")
     parser.add_argument("--num_glob_iters", type=int, default=250)
     parser.add_argument("--local_epochs", type=int, default=1)
-    parser.add_argument("--optimizer", type=str, default="")
     parser.add_argument("--algorithm", type=str, default="FedAvg", choices=["FEDL", "FedAvg", "SCAFFOLD"])
     parser.add_argument("--clients_per_round", type=int, default=0, help="Number of Users per round")
     parser.add_argument("--rho", type=float, default=0, help="Condition Number")
@@ -88,5 +86,5 @@ if __name__ == "__main__":
     simulate(dataset=args.dataset, algorithm=args.algorithm, model=args.model,
              batch_size=args.batch_size, learning_rate=args.learning_rate,
              hyper_learning_rate=args.hyper_learning_rate, L=args.L, num_glob_iters=args.num_glob_iters,
-             local_epochs=args.local_epochs, optimizer=args.optimizer, users_per_round=args.clients_per_round,
+             local_epochs=args.local_epochs, users_per_round=args.clients_per_round,
              rho=args.rho, similarity=args.similarity, noise=args.noise, times=args.times)

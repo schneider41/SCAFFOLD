@@ -86,7 +86,6 @@ class CifarNet(nn.Module):
         self.conv1 = nn.Conv2d(3, 32, 5, 1, 2)  # doubled bias learning rate
         self.conv2 = nn.Conv2d(32, 32, 5, 1, 2)  # doubled bias learning rate
         self.conv3 = nn.Conv2d(32, 64, 5, 1, 2)  # doubled bias learning rate
-        # self.fc1 = nn.Linear(256, 64)
         self.fc1 = nn.Linear(576, 64)
         self.fc2 = nn.Linear(64, categories)
 
@@ -101,9 +100,8 @@ class CifarNet(nn.Module):
         x = nn.ReLU()(x)
         x = nn.AvgPool2d(3, 2)(x)
         x = torch.flatten(x, 1)
-        # x = x.view(-1, 4800)
         x = self.fc1(x)
         x = nn.ReLU()(x)
         x = self.fc2(x)
-        output = F.log_softmax(x, dim=1)
+        output = F.softmax(x, dim=1)
         return output

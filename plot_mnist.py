@@ -6,7 +6,7 @@ import argparse
 import importlib
 import random
 import os
-from flearn.servers.serveravg import FedAvg
+from flearn.servers.server_avg import FedAvg
 from flearn.servers.serverfedl import FEDL
 from flearn.trainmodel.models import *
 from utils.plot_utils import *

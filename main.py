@@ -17,7 +17,7 @@ input_dict = {"dataset": "CIFAR-10",
               "model": "CIFAR-10",
               "num_glob_iters": 50,
               "batch_size": 60,
-              "learning_rate": 0.008,
+              "learning_rate": 0.08,
               "local_epochs": None,
               "L": 0.004,
               "users_per_round": 0,
@@ -26,13 +26,14 @@ input_dict = {"dataset": "CIFAR-10",
               "noise": False}
 
 algorithms = ["SCAFFOLD", "FedAvg"]
+# algorithms = ["SCAFFOLD"]
 epochs = [1]
 
-for alg in algorithms:
-    for ep in epochs:
-        input_dict["algorithm"] = alg
-        input_dict["local_epochs"] = ep
-        simulate(hyper_learning_rate=0, optimizer=None, rho=0, **input_dict)
+# for alg in algorithms:
+#     for ep in epochs:
+#         input_dict["algorithm"] = alg
+#         input_dict["local_epochs"] = ep
+#         simulate(hyper_learning_rate=0, rho=0, **input_dict)
 
 # for similarity in similarities:
 #     create_dataset(input_dict["dataset"], 100, similarity, 20)

@@ -148,9 +148,9 @@ class Metrics(object):
     def __init__(self, clients, params):
         self.params = params
         num_rounds = params['num_rounds']
-        self.bytes_written = {c.id: [0] * num_rounds for c in clients}
-        self.client_computations = {c.id: [0] * num_rounds for c in clients}
-        self.bytes_read = {c.id: [0] * num_rounds for c in clients}
+        self.bytes_written = {c.user_id: [0] * num_rounds for c in clients}
+        self.client_computations = {c.user_id: [0] * num_rounds for c in clients}
+        self.bytes_read = {c.user_id: [0] * num_rounds for c in clients}
         self.accuracies = []
         self.train_accuracies = []
 
