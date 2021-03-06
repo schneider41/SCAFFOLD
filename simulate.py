@@ -43,7 +43,7 @@ def simulate(dataset, algorithm, model, batch_size, learning_rate, L, num_glob_i
         if model == "dnn":  # for Mnist and Femnist datasets
             model = DNN(), model
 
-        if model == "CIFAR-10":  # for Cifar-10 dataset
+        if model == "cnn":  # for Cifar-10 dataset
             model = CifarNet(), model
 
         # select algorithm

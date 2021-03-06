@@ -83,7 +83,6 @@ class SCAFFOLDOptimizer(Optimizer):
         super(SCAFFOLDOptimizer, self).__init__(params, defaults)
         pass
 
-
     def step(self, server_controls, client_controls, closure=None):
         loss = None
         if closure is not None:

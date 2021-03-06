@@ -8,7 +8,7 @@ import argparse
 from os.path import dirname
 
 
-def generate_data(similarity, num_of_users, samples_num):
+def generate_data(similarity, num_of_users=100, samples_num=20):
     root_path = os.path.dirname(__file__)
     train_path = root_path + '/data/train/mytrain.json'
     test_path = root_path + '/data/test/mytest.json'

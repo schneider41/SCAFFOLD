@@ -17,12 +17,12 @@ class UserAVG(User):
 
         if model[1] == "linear":
             self.loss = nn.MSELoss()
-        elif model[1] == "CIFAR-10":
+        elif model[1] == "cnn":
             self.loss = nn.CrossEntropyLoss()
         else:
             self.loss = nn.NLLLoss()
 
-        if model[1] == "CIFAR-10":
+        if model[1] == "cnn":
             layers = [self.model.conv1, self.model.conv2, self.model.conv3, self.model.fc1, self.model.fc2]
             self.optimizer = torch.optim.SGD([{'params': layer.weight} for layer in layers] +
                                              [{'params': layer.bias, 'lr': 2 * self.learning_rate} for layer in layers],
