@@ -15,8 +15,8 @@ import torch
 torch.manual_seed(0)
 
 
-def simulate(dataset, algorithm, model, batch_size, learning_rate, hyper_learning_rate, L, num_glob_iters,
-             local_epochs, users_per_round, rho, similarity, noise, times):
+def simulate(dataset, algorithm, model, batch_size, learning_rate, L, num_glob_iters, local_epochs, users_per_round,
+             similarity, noise, times):
     print("=" * 80)
     print("Summary of training process:")
     print(f"Algorithm: {algorithm}")
@@ -48,19 +48,18 @@ def simulate(dataset, algorithm, model, batch_size, learning_rate, hyper_learnin
 
         # select algorithm
         if algorithm == "FedAvg":
-            server = FedAvg(dataset, algorithm, model, batch_size, learning_rate, hyper_learning_rate, L,
-                            num_glob_iters, local_epochs, users_per_round, rho, similarity, noise, i)
+            server = FedAvg(dataset, algorithm, model, batch_size, learning_rate, L, num_glob_iters, local_epochs,
+                            users_per_round, similarity, noise, i)
 
         if algorithm == "SCAFFOLD":
-            server = SCAFFOLD(dataset, algorithm, model, batch_size, learning_rate, hyper_learning_rate, L,
-                              num_glob_iters, local_epochs, users_per_round, similarity, noise, i)
+            server = SCAFFOLD(dataset, algorithm, model, batch_size, learning_rate, L, num_glob_iters, local_epochs,
+                              users_per_round, similarity, noise, i)
         server.train()
         server.test()
 
     # Average data
-    average_data(clients_per_round=users_per_round, local_epochs=local_epochs, num_glob_iters=num_glob_iters,
-                 learning_rate=learning_rate, algorithm=algorithm, batch_size=batch_size, dataset=dataset,
-                 similarity=similarity, noise=noise, times=times)
+    average_data(num_glob_iters=num_glob_iters, algorithm=algorithm, dataset=dataset, similarity=similarity,
+                 noise=noise, times=times)
 
 
 if __name__ == "__main__":

@@ -18,17 +18,12 @@ def read_from_results(file_name):
 
 
 # TODO: replace all args with input_dict
-def get_all_training_data_value(clients_per_round, local_epochs, num_glob_iters, learning_rate,
-                                algorithm, batch_size, dataset, times, similarity, noise):
+def get_all_training_data_value(num_glob_iters, algorithm, dataset, times, similarity, noise):
     train_acc = np.zeros((times, num_glob_iters))
     train_loss = np.zeros((times, num_glob_iters))
     glob_acc = np.zeros((times, num_glob_iters))
 
     file_name = "./results/" + dataset + "_" + algorithm
-    file_name += "_" + str(learning_rate) + "lr"
-    file_name += "_" + str(clients_per_round) + "u"
-    file_name += "_" + str(batch_size) + "b"
-    file_name += "_" + str(local_epochs) + "e"
     file_name += "_" + str(similarity) + "s"
     if noise:
         file_name += '_noisy'
@@ -57,11 +52,9 @@ def average_smooth(data, window_len=10, window='hanning'):
     return np.array(results)
 
 
-def average_data(clients_per_round, local_epochs, num_glob_iters, learning_rate, algorithm, batch_size,
-                 dataset, times, similarity, noise):
-    glob_acc, train_acc, train_loss = get_all_training_data_value(clients_per_round, local_epochs, num_glob_iters,
-                                                                  learning_rate, algorithm, batch_size, dataset, times,
-                                                                  similarity, noise)
+def average_data(num_glob_iters, algorithm, dataset, times, similarity, noise):
+    glob_acc, train_acc, train_loss = get_all_training_data_value(num_glob_iters, algorithm, dataset, times, similarity,
+                                                                  noise)
 
     glob_acc_data = np.average(glob_acc, axis=0)
     train_acc_data = np.average(train_acc, axis=0)
@@ -75,10 +68,6 @@ def average_data(clients_per_round, local_epochs, num_glob_iters, learning_rate,
 
     # store average value to h5 file
     file_name = "./results/" + dataset + "_" + algorithm
-    file_name += "_" + str(learning_rate) + "lr"
-    file_name += "_" + str(clients_per_round) + "u"
-    file_name += "_" + str(batch_size) + "b"
-    file_name += "_" + str(local_epochs) + "e"
     file_name += "_" + str(similarity) + "s"
     if noise:
         file_name += '_noisy'
@@ -135,4 +124,31 @@ def plot_by_epochs(dataset, algorithms, num_glob_iters, learning_rate, users_per
             train_acc, train_loss, glob_acc = np.array(read_from_results(file_name))[:, :num_glob_iters]
             axs[k].plot(glob_acc, color=colours[j], label=algorithm)
             axs[k].legend(loc="lower right")
+    plt.show()
+
+
+def plot_by_similarities(dataset, algorithms, noises, similarities, num_glob_iters):
+    # TODO: check if i can take all this args from the results file
+    fig, axs = plt.subplots(1, len(similarities), constrained_layout=True)
+    if len(similarities) == 1:
+        axs = [axs]
+
+    for k, similarity in enumerate(similarities):
+        axs[k].set_xlabel("Global Iterations")
+        axs[k].set_ylabel("Accuracy")
+        axs[k].set_title(str(100 * similarity) + "% Similarity")
+
+        for noise in noises:
+            for j, algorithm in enumerate(algorithms):
+                file_name = "./results/" + dataset
+                file_name += "_" + algorithm
+                file_name += "_" + str(similarity) + "s"
+                label = algorithm
+                if noise:
+                    file_name += '_noisy'
+                    label += ' with noise'
+                file_name += "_avg.h5"
+                train_acc, train_loss, glob_acc = np.array(read_from_results(file_name))[:, :num_glob_iters]
+                axs[k].plot(glob_acc, label=label)
+                axs[k].legend(loc="lower right")
     plt.show()

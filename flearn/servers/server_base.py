@@ -9,8 +9,8 @@ from scipy.stats import rayleigh
 
 
 class Server:
-    def __init__(self, dataset, algorithm, model, batch_size, learning_rate, hyper_learning_rate, L,
-                 num_glob_iters, local_epochs, users_per_round, rho, similarity, noise, times):
+    def __init__(self, dataset, algorithm, model, batch_size, learning_rate, L,
+                 num_glob_iters, local_epochs, users_per_round, similarity, noise, times):
 
         # Set up the main attributes
         self.dataset = dataset
@@ -23,16 +23,14 @@ class Server:
         self.users = []
         self.selected_users = []
         self.users_per_round = users_per_round
-        self.hyper_learning_rate = hyper_learning_rate
         self.L = L
         self.algorithm = algorithm
         self.rs_train_acc, self.rs_train_loss, self.rs_glob_acc = [], [], []
 
-        self.rho = rho
         self.times = times
         self.similarity = similarity
-        self.communication_thresh = rayleigh.ppf(0.2)  # h_min
         self.noise = noise
+        self.communication_thresh = None
 
     def aggregate_grads(self):
         assert (self.users is not None and len(self.users) > 0)
@@ -71,7 +69,7 @@ class Server:
 
     def select_transmitting_users(self):
         transmitting_users = []
-        for user in self.selected_users:
+        for user in self.users:
             user.csi = rayleigh.rvs()
             if user.csi >= self.communication_thresh:
                 transmitting_users.append(user)
@@ -80,10 +78,10 @@ class Server:
     def save_results(self):
         """ Save loss, accuracy to h5 file"""
         file_name = "./results/" + self.dataset + "_" + self.algorithm
-        file_name += "_" + str(self.learning_rate) + "lr"
-        file_name += "_" + str(self.users_per_round) + "u"
-        file_name += "_" + str(self.batch_size) + "b"
-        file_name += "_" + str(self.local_epochs) + "e"
+        # file_name += "_" + str(self.learning_rate) + "lr"
+        # file_name += "_" + str(self.users_per_round) + "u"
+        # file_name += "_" + str(self.batch_size) + "b"
+        # file_name += "_" + str(self.local_epochs) + "e"
         file_name += "_" + str(self.similarity) + "s"
         if self.noise:
             file_name += '_noisy'

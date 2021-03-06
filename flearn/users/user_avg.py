@@ -12,10 +12,8 @@ from torch.optim.lr_scheduler import StepLR
 # Implementation for FedAvg clients
 
 class UserAVG(User):
-    def __init__(self, numeric_id, train_data, test_data, model, batch_size, learning_rate,
-                 hyper_learning_rate, L, local_epochs):
-        super().__init__(numeric_id, train_data, test_data, model[0], batch_size, learning_rate, hyper_learning_rate, L,
-                         local_epochs)
+    def __init__(self, numeric_id, train_data, test_data, model, batch_size, learning_rate, L, local_epochs):
+        super().__init__(numeric_id, train_data, test_data, model[0], batch_size, learning_rate, L, local_epochs)
 
         if model[1] == "linear":
             self.loss = nn.MSELoss()
@@ -68,4 +66,4 @@ class UserAVG(User):
         for delta in self.delta_model:
             params.append(torch.flatten(delta.data))
         # return torch.linalg.norm(torch.cat(params), 2)
-        return torch.norm(torch.cat(params), 2)
+        return torch.max(torch.cat(params))

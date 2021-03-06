@@ -12,8 +12,7 @@ class User:
     """
     Base class for users in federated learning.
     """
-    def __init__(self, user_id, train_data, test_data, model, batch_size, learning_rate,
-                 hyper_learning_rate, L, local_epochs):
+    def __init__(self, user_id, train_data, test_data, model, batch_size, learning_rate, L, local_epochs):
         self.model = copy.deepcopy(model)
         self.user_id = user_id  # integer
         self.train_samples = len(train_data)
@@ -23,7 +22,6 @@ class User:
         else:
             self.batch_size = batch_size
         self.learning_rate = learning_rate
-        self.hyper_learning_rate = hyper_learning_rate
         self.L = L
         self.local_epochs = local_epochs
         self.scheduler = None

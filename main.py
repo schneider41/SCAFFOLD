@@ -1,48 +1,39 @@
 from utils.plot_utils import *
 from simulate import simulate
-from data.Femnist.data_generator import generate_data as femnist_generator
+from data.Femnist.data_generator import generate_data as generate_femnist_data
 
-
-def create_dataset(dataset, total_users, similarity, samples_num):
-    if dataset == "Femnist":
-        femnist_generator(similarity, total_users, samples_num)
-    if dataset == "CIFAR-10":
-        pass  # TODO : create data generator for CIFAR-10
-    if dataset == "Mnist":
-        pass  # TODO : create data generator for Mnist
-
-
-input_dict = {"dataset": "CIFAR-10",
+input_dict = {"dataset": "Femnist",
               "algorithm": None,
-              "model": "CIFAR-10",
-              "num_glob_iters": 50,
-              "batch_size": 60,
-              "learning_rate": 0.08,
-              "local_epochs": None,
-              "L": 0.004,
-              "users_per_round": 0,
-              "similarity": 1,
+              "model": "mclr",
+              "num_glob_iters": 300,
+              "batch_size": 4,
+              "learning_rate": 0.001,
+              "local_epochs": 1,
+              "L": 0,
+              "users_per_round": 20,
+              "similarity": None,
               "times": 1,
-              "noise": False}
+              "noise": None}
 
 algorithms = ["SCAFFOLD", "FedAvg"]
+noises = [True, False]
+similarities = [1, 0.1, 0]
 # algorithms = ["SCAFFOLD"]
-epochs = [1]
+# noises = [True]
+# similarities = [0]
 
-# for alg in algorithms:
-#     for ep in epochs:
-#         input_dict["algorithm"] = alg
-#         input_dict["local_epochs"] = ep
-#         simulate(hyper_learning_rate=0, rho=0, **input_dict)
+for similarity in similarities:
+    print("Downloading dataset")
+    generate_femnist_data(similarity, 100, 20)
+    for noise in noises:
+        for algorithm in algorithms:
+            input_dict["algorithm"] = algorithm
+            input_dict["similarity"] = similarity
+            input_dict["noise"] = noise
+            simulate(**input_dict)
 
-# for similarity in similarities:
-#     create_dataset(input_dict["dataset"], 100, similarity, 20)
-#     input_dict["similarity"] = similarity
-#     for alg in algorithms:
-#         for ep in epochs:
-#             input_dict["algorithm"] = alg
-#             input_dict["local_epochs"] = ep
-#             simulate(hyper_learning_rate=0, L=0, optimizer=None, rho=0, **input_dict)
 
-plot_dict = get_plot_dict(input_dict, algorithms, epochs)
-plot_by_epochs(**plot_dict)
+plot_by_similarities(input_dict["dataset"], algorithms, noises, similarities, input_dict["num_glob_iters"])
+
+# plot_dict = get_plot_dict(input_dict, algorithms, epochs)
+# plot_by_epochs(**plot_dict)

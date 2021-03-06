@@ -9,8 +9,9 @@ from os.path import dirname
 
 
 def generate_data(similarity, num_of_users, samples_num):
-    train_path = './data/train/mytrain.json'
-    test_path = './data/test/mytest.json'
+    root_path = os.path.dirname(__file__)
+    train_path = root_path + '/data/train/mytrain.json'
+    test_path = root_path + '/data/test/mytest.json'
     dir_path = os.path.dirname(train_path)
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
