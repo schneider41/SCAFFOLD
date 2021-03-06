@@ -17,7 +17,14 @@ femnist_dict = {"model": "mclr",
                 "L": 0,
                 "users_per_round": 20}
 
+input_dict = {}
+
 dataset = 'CIFAR'
+if dataset == 'CIFAR':
+    input_dict = cifar_dict
+elif dataset == 'Femnist':
+    input_dict = femnist_dict
+
 num_glob_iters = 200
 times = 1
 algorithms = ["SCAFFOLD", "FedAvg"]
@@ -30,7 +37,7 @@ for similarity in similarities:
     # generate_cifar10_data(similarity)
     for noise in noises:
         for algorithm in algorithms:
-            simulate(**cifar_dict, dataset=dataset, algorithm=algorithm, similarity=similarity, noise=noise,
+            simulate(**input_dict, dataset=dataset, algorithm=algorithm, similarity=similarity, noise=noise,
                      num_glob_iters=num_glob_iters, times=times)
 
 plot_by_similarities(dataset, algorithms, noises, similarities, num_glob_iters)
