@@ -91,7 +91,7 @@ class SCAFFOLD(Server):
             param.data = param.data + del_model.data / num_of_selected_users
             control.data = control.data + del_control.data / num_of_users
 
-    def apply_channel_effect(self, sigma=1, power_control=4):
+    def apply_channel_effect(self, sigma=1, power_control=2500):
         num_of_selected_users = len(self.selected_users)
         param_norms = []
         control_norms = []
@@ -100,7 +100,7 @@ class SCAFFOLD(Server):
             param_norms.append(param_norm)
             control_norms.append(control_norm)
         alpha_t_params = power_control / max(param_norms) ** 2
-        alpha_t_controls = 1000 * power_control / max(control_norms) ** 2
+        alpha_t_controls = 4e4 * power_control / max(control_norms) ** 2
         for param, control in zip(self.model.parameters(), self.server_controls):
             param.data = param.data + sigma / (
                         alpha_t_params ** 0.5 * num_of_selected_users * self.communication_thresh) * torch.randn(

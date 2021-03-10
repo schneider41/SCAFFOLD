@@ -76,7 +76,7 @@ class FedAvg(Server):
             # server_param.data = server_param.data + del_model.data * ratio
             server_param.data = server_param.data + del_model.data / num_of_selected_users
 
-    def apply_channel_effect(self, sigma=1, power_control=4):
+    def apply_channel_effect(self, sigma=1, power_control=2500):
         num_of_selected_users = len(self.selected_users)
         users_norms = []
         for user in self.selected_users:

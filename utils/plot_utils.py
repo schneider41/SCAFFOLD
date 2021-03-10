@@ -129,7 +129,10 @@ def plot_by_epochs(dataset, algorithms, num_glob_iters, learning_rate, users_per
 
 def plot_by_similarities(dataset, algorithms, noises, similarities, num_glob_iters):
     # TODO: check if i can take all this args from the results file
+    colours = ['r', 'g']
     fig, axs = plt.subplots(1, len(similarities), constrained_layout=True)
+    fig.suptitle(f"{dataset}")
+
     if len(similarities) == 1:
         axs = [axs]
 
@@ -144,11 +147,13 @@ def plot_by_similarities(dataset, algorithms, noises, similarities, num_glob_ite
                 file_name += "_" + algorithm
                 file_name += "_" + str(similarity) + "s"
                 label = algorithm
+                color = colours[j]
                 if noise:
                     file_name += '_noisy'
                     label += ' with noise'
+                    color += ':'
                 file_name += "_avg.h5"
                 train_acc, train_loss, glob_acc = np.array(read_from_results(file_name))[:, :num_glob_iters]
-                axs[k].plot(glob_acc, label=label)
+                axs[k].plot(glob_acc, color, label=label)
                 axs[k].legend(loc="lower right")
     plt.show()
