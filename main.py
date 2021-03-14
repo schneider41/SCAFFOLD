@@ -34,23 +34,24 @@ elif dataset == 'Femnist':
     input_dict = femnist_dict
 
 num_glob_iters = 300
-times = 20
+times = 15
 algorithms = ["SCAFFOLD", "FedAvg"]
 noises = [True, False]
 similarities = [1, 0.1, 0]
 
 
-for similarity in similarities:
-    generate_data(dataset, similarity)
-    for noise in noises:
-        for algorithm in algorithms:
-            simulate(**input_dict, dataset=dataset, algorithm=algorithm, similarity=similarity, noise=noise,
-                     num_glob_iters=num_glob_iters, times=times)
+# for similarity in similarities:
+#     generate_data(dataset, similarity)
+#     for noise in noises:
+#         for algorithm in algorithms:
+#             simulate(**input_dict, dataset=dataset, algorithm=algorithm, similarity=similarity, noise=noise,
+#                      num_glob_iters=num_glob_iters, times=times)
 
-plot_by_similarities(dataset, algorithms, noises, similarities, num_glob_iters)
+plot_accuracy(dataset, algorithms, noises, similarities, num_glob_iters)
+plot_norms(dataset, algorithms, noises, similarities, num_glob_iters)
 
 # plot_dict = get_plot_dict(input_dict, algorithms, epochs)
-# plot_by_epochs(**plot_dict)
+# plot_norms(**plot_dict)
 
 
 

@@ -103,4 +103,4 @@ class UserSCAFFOLD(User):
             controls.append(torch.flatten(delta.data))
 
         # return torch.linalg.norm(torch.cat(params), 2)
-        return torch.norm(torch.cat(params)), torch.norm(torch.cat(controls))
+        return float(torch.norm(torch.cat(params))), float(torch.norm(torch.cat(controls)))
